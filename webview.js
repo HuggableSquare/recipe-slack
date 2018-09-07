@@ -1,5 +1,5 @@
-import { ipcRenderer } from 'electron';
-import path from 'path';
+const { ipcRenderer } = require('electron');
+const path = require('path');
 
 const getTeamIcon = function getTeamIcon(count = 0) {
   let countTeamIconCheck = count;
@@ -33,8 +33,15 @@ const getTeamIcon = function getTeamIcon(count = 0) {
   }
 };
 
-const SELECTOR_CHANNELS_UNREAD = '.p-channel_sidebar__channel--unread:not(.p-channel_sidebar__channel--muted)';
+const getSidebarColor = function getSidebarColor() {
+  const sidebar = document.querySelector('.client_channels_list_container');
+  if (sidebar) {
+    const color = window.getComputedStyle(sidebar, null).getPropertyValue('background');
+    ipcRenderer.sendToHost('sidebarColor', color);
+  }
+};
 
+const SELECTOR_CHANNELS_UNREAD = '.p-channel_sidebar__channel--unread:not(.p-channel_sidebar__channel--muted)';
 module.exports = (Franz) => {
   const getMessages = () => {
     const directMessages = document.querySelectorAll(`${SELECTOR_CHANNELS_UNREAD} .p-channel_sidebar__badge`).length;
@@ -47,6 +54,7 @@ module.exports = (Franz) => {
 
   setTimeout(() => {
     getTeamIcon();
+    getSidebarColor();
   }, 4000);
 
   // inject franz.css stylesheet
